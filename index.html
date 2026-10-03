@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tinder | Date Proposal</title>
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #fd267d, #ff6036);
+      --tinder-pink: #fe3c72;
+      --tinder-green: #20c997;
+      --tinder-blue: #00b0ff;
+      --tinder-yellow: #f5a623;
+      --bg-dark: #0a0c10;
+      --card-bg: #14171f;
+      --text-muted: #8e95a5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: pan-y;
+    }
+
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Container replicating a modern smartphone display */
+    .app-viewport {
+      width: 100%;
+      max-width: 420px;
+      height: 100vh;
+      max-height: 890px;
+      background: var(--bg-dark);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
+    }
+
+    /* Top Global Header */
+    .app-header {
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      z-index: 100;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tinder-flame {
+      font-size: 1.4rem;
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .status-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 4px 12px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+
+    /* Main Deck Space */
+    .deck-container {
+      flex: 1;
+      position: relative;
+      margin: 10px 14px 2px;
+      perspective: 1200px;
+    }
+
+    .card {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      overflow: hidden;
+      will-change: transform;
+      cursor: grab;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .card:active {
+      cursor: grabbing;
+    }
+
+    /* Dynamic Instagram/Tinder-style stories bar at top of card */
+    .story-indicators {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      gap: 5px;
+      z-index: 4;
+    }
+
+    .story-bar {
+      flex: 1;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.35);
+      border-radius: 2px;
+    }
+
+    .story-bar.active {
+      background: #ffffff;
+    }
+
+    /* Cinematic Gradient */
+    .card::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 68%;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 20%, rgba(0, 0, 0, 0.5) 65%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .card-body {
+      position: relative;
+      z-index: 3;
+      padding: 24px 18px;
+      color: #fff;
+    }
+
+    .badge-pill {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #ff6036;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.85rem;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .card-title-row .age {
+      font-weight: 400;
+      color: #e5e7eb;
+    }
+
+    .verified-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      background: #00b0ff;
+      color: #fff;
+      font-size: 12px;
+      border-radius: 50%;
+    }
+
+    .sub-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin: 4px 0 10px;
+    }
+
+    .card-description {
+      font-size: 0.95rem;
+      color: #e2e8f0;
+      line-height: 1.4;
+    }
+
+    .prompt-box {
+      margin-top: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(6px);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      border-left: 3px solid #ff6036;
+    }
+
+    /* Swipe Overlay Stamps */
+    .stamp {
+      position: absolute;
+      top: 45px;
+      padding: 6px 16px;
+      font-size: 2.1rem;
+      font-weight: 900;
+      border-width: 4px;
+      border-style: solid;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    .stamp.like {
+      left: 20px;
+      color: var(--tinder-green);
+      border-color: var(--tinder-green);
+      transform: rotate(-14deg);
+    }
+
+    .stamp.nope {
+      right: 20px;
+      color: var(--tinder-pink);
+      border-color: var(--tinder-pink);
+      transform: rotate(14deg);
+    }
+
+    .stamp.superlike {
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%) rotate(0deg);
+      color: var(--tinder-blue);
+      border-color: var(--tinder-blue);
+    }
+
+    /* Bottom Control Bar */
+    .action-row {
+      height: 96px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 8px;
+    }
+
+    .round-btn {
+      border-radius: 50%;
+      border: none;
+      background: #181c24;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    .round-btn:active {
+      transform: scale(0.85);
+    }
+
+    .round-btn.sm {
+      width: 46px;
+      height: 46px;
+      font-size: 1.1rem;
+    }
+
+    .round-btn.lg {
+      width: 64px;
+      height: 64px;
+      font-size: 1.8rem;
+    }
+
+    .btn-rewind {
+      color: var(--tinder-yellow);
+    }
+
+    .btn-nope {
+      color: var(--tinder-pink);
+      border: 1px solid rgba(254, 60, 114, 0.3);
+    }
+
+    .btn-superlike {
+      color: var(--tinder-blue);
+    }
+
+    .btn-like {
+      color: var(--tinder-green);
+      border: 1px solid rgba(32, 201, 151, 0.3);
+    }
+
+    /* Match Overlay */
+    .match-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(8, 10, 14, 0.97);
+      backdrop-filter: blur(14px);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .match-screen.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .match-logo {
+      font-size: 3.2rem;
+      font-family: 'Brush Script MT', cursive, sans-serif;
+      font-style: italic;
+      letter-spacing: 1px;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 2px;
+    }
+
+    .match-tagline {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+
+    .itinerary-card {
+      width: 100%;
+      background: #14171f;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: left;
+      color: #fff;
+      font-size: 0.95rem;
+      line-height: 2.1;
+      margin-bottom: 26px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .itinerary-card b {
+      color: #fe3c72;
+    }
+
+    .whatsapp-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 999px;
+      background: var(--primary-gradient);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      box-shadow: 0 10px 25px rgba(254, 60, 114, 0.4);
+      display: inline-block;
+      transition: transform 0.15s ease;
+    }
+
+    .whatsapp-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-viewport">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="brand-group">
+        <span class="tinder-flame">🔥</span>
+        <span class="brand-title">tinder</span>
+      </div>
+      <span class="status-badge" id="stepBadge">Profile</span>
+    </header>
+
+    <!-- Card Stack Container -->
+    <main class="deck-container" id="deck"></main>
+
+    <!-- Controls Bar -->
+    <footer class="action-row">
+      <button class="round-btn sm btn-rewind" id="rewindBtn" title="Rewind">↺</button>
+      <button class="round-btn lg btn-nope" id="nopeBtn" title="Nope">✕</button>
+      <button class="round-btn sm btn-superlike" id="superlikeBtn" title="Super Like">★</button>
+      <button class="round-btn lg btn-like" id="likeBtn" title="Like">♥</button>
+    </footer>
+
+    <!-- Official Match Modal -->
+    <section class="match-screen" id="matchScreen">
+      <h1 class="match-logo">It's a Match!</h1>
+      <p class="match-tagline">You and Niket agreed on the date plan.</p>
+
+      <div class="itinerary-card" id="summaryCard"></div>
+
+      <a href="#" class="whatsapp-btn" id="whatsappLink">Lock In Date on WhatsApp</a>
+    </section>
+  </div>
+
+  <script>
+    // 4 Distinct High-Production Modules
+    const flowSteps = [
+      {
+        stepName: "Profile View",
+        badge: "Profile",
+        key: "proposal_accepted",
+        items: [
+          {
+            title: "Niket Saini",
+            age: "22",
+            subtitle: "📍 2 km away • Active now",
+            desc: "Spontaneous night drives, architectural cafes, and heated debates over the best pizza in town.",
+            prompt: "My simple date proposition: Swipe right to plan our evening together.",
+            img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=900&auto=format&fit=crop&q=80"
+          }
+        ]
+      },
+      {
+        stepName: "Aesthetic / Vibe",
+        badge: "1 of 3: Vibe",
+        key: "vibe",
+        items: [
+          {
+            title: "Minimal All-Black",
+            age: "",
+            subtitle: "Night Out • Tailored",
+            desc: "Clean monochrome tones, sleek leather silhouettes, and midnight cologne.",
+            prompt: "Vibe check: Classic, effortless, and sharp.",
+            img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=900&auto=format&fit=crop&q=80"
+          },
+          {
+            title: "Denim & Classic White",
+            age: "",
+            subtitle: "Casual • Day to Dusk",
+            desc: "Crisp white tees, relaxed denim, clean sneakers, and natural daylight.",
+            prompt: "Vibe check: Timeless and easygoing.",
+            img: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=900&auto=format&fit=crop&q=80"
+          },
+          {
+            title: "Cozy Oversized Knits",
+            age: "",
+            subtitle: "Comfort • Intimate",
+            desc: "Warm oversized hoodies, autumn color palettes, relaxed aesthetic.",
+            prompt: "Vibe check: Zero pressure, pure comfort.",
+            img: "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?w=900&auto=format&fit=crop&q=80"
+          },
+          {
+            title: "High-End Evening Glam",
+            age: "",
+            subtitle: "Formal • Elevated",
+            desc: "Evening dresses, sharp suits, rooftop skyline backdrops.",
+            prompt: "Vibe check: Red carpet luxury standard.",
+            img: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=900&auto=format&fit=crop&q=80"
+          }
+        ]
+      },
+      {
+        stepName: "Prime Experience",
+        badge: "2 of 3: Plan",
+        key: "activity",
+        items: [
+          {
+            title: "Golden Hour Drive",
+            age: "",
+            subtitle: "Panoramic Skyline • Curated Music",
+            desc: "Open highway, sunset hues across the dashboard, and uninterrupted conversations.",
+            prompt: "Highlights: Windows cracked open, AUX cord supremacy.",
+            img: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=900&auto=format&fit=crop&q=80"
+          },
+          {
+            title: "Vintage Photobooth Snaps",
+            age: "",
+            subtitle: "Memories • Polaroids",
+            desc: "Retro photo strips, silly spontaneous poses, physical memories to hold onto.",
+            prompt: "Highlights: Authentic non-digital memories.",
+            img: "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?w=900&auto=format&fit=crop&q=80"
+          },
+          {
+            title: "Retro Arcade & Bowling",
+            age: "",
+            subtitle: "High Energy • Friendly Competition",
+            desc: "Neon glow, air hockey shootouts, arcade basketball, friendly wagers.",
+            prompt: "Highlights: Winner claims dessert bragging rights.",
+            img: "https://images.unsplash.com/photo-1511882150382-421056c89033?w=900&auto=format&fit=crop&q=80"
+          },
+          {
+            title: "Late Night Artisan Cafe",
+            age: "",
+            subtitle: "Intimate • Chill",
+            desc: "Iced coffees, soft acoustics, and endless deep talks without looking at the clock.",
+            prompt: "Highlights: Hours pass by like minutes.",
+            img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=900&auto=format&fit=crop&q=80"
+          }
+        ]
+      },
+      {
+        stepName: "Culinary Selection",
+        badge: "3 of 3: Dining",
+        key: "food",
+        items: [
+          {
+            title: "Woodfired Neapolitan Pizza",
+            age: "",
+            subtitle: "Italian • Rustic",
+            desc: "Charred blistered crust, melted fresh mozzarella, extra basil and chili flakes.",
+            prompt: "Food rule: Never leave the crust behind.",
+            img: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=900&auto=format&fit=crop&q=80"
+          },
+          {
+            title: "Artisanal Steamed Momos",
+            age: "",
+            subtitle: "Comfort • Bold Flavors",
+            desc: "Thin wrapper dumplings paired with fiery garlic roasted tomato chutney.",
+            prompt: "Food rule: Extra spicy dip is non-negotiable.",
+            img: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=900&auto=format&fit=crop&q=80"
+          },
+          {
+            title: "Gourmet Burgers & Fries",
+            age: "",
+            subtitle: "Hearty • Classic",
+            desc: "Toasted brioche, double caramelized smash patties, and seasoned fries.",
+            prompt: "Food rule: Indulgent comfort dining.",
+            img: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=900&auto=format&fit=crop&q=80"
+          },
+          {
+            title: "Belgian Gelato & Pastries",
+            age: "",
+            subtitle: "Sweet Finish • Walk",
+            desc: "Double dark chocolate gelato, warm waffles, and a night stroll.",
+            prompt: "Food rule: Always save room for sugar.",
+            img: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=900&auto=format&fit=crop&q=80"
+          }
+        ]
+      }
+    ];
+
+    let currentStepIdx = 0;
+    let userSelections = {};
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let diffX = 0;
+
+    const deck = document.getElementById("deck");
+    const stepBadge = document.getElementById("stepBadge");
+    const nopeBtn = document.getElementById("nopeBtn");
+    const likeBtn = document.getElementById("likeBtn");
+    const superlikeBtn = document.getElementById("superlikeBtn");
+    const rewindBtn = document.getElementById("rewindBtn");
+    const matchScreen = document.getElementById("matchScreen");
+    const summaryCard = document.getElementById("summaryCard");
+    const whatsappLink = document.getElementById("whatsappLink");
+
+    function renderDeck() {
+      deck.innerHTML = "";
+
+      if (currentStepIdx >= flowSteps.length) {
+        triggerMatch();
+        return;
+      }
+
+      const activeModule = flowSteps[currentStepIdx];
+      stepBadge.innerText = activeModule.badge;
+
+      // Render cards in reverse order so the first card is physically on top
+      activeModule.items.slice().reverse().forEach((item, index) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.style.backgroundImage = `url('${item.img}')`;
+        card.dataset.title = item.title;
+
+        card.innerHTML = `
+          <div class="story-indicators">
+            <div class="story-bar active"></div>
+            <div class="story-bar"></div>
+            <div class="story-bar"></div>
+          </div>
+          <div class="stamp like">LIKE</div>
+          <div class="stamp nope">NOPE</div>
+          <div class="stamp superlike">SUPER LIKE</div>
+          <div class="card-body">
+            <span class="badge-pill">${activeModule.stepName}</span>
+            <div class="card-title-row">
+              ${item.title} ${item.age ? `<span class="age">${item.age}</span>` : ""}
+              <span class="verified-icon">✓</span>
+            </div>
+            <div class="sub-meta">${item.subtitle}</div>
+            <p class="card-description">${item.desc}</p>
+            <div class="prompt-box">${item.prompt}</div>
+          </div>
+        `;
+
+        bindTouchControls(card);
+        deck.appendChild(card);
+      });
+    }
+
+    function bindTouchControls(card) {
+      function dragStart(e) {
+        const topCard = getTopCard();
+        if (topCard !== card) return;
+
+        isDragging = true;
+        startX = e.type.includes("touch") ? e.touches[0].clientX : e.clientX;
+        startY = e.type.includes("touch") ? e.touches[0].clientY : e.clientY;
+        card.style.transition = "none";
+      }
+
+      function dragMove(e) {
+        if (!isDragging) return;
+        const currentX = e.type.includes("touch") ? e.touches[0].clientX : e.clientX;
+        const currentY = e.type.includes("touch") ? e.touches[0].clientY : e.clientY;
+        diffX = currentX - startX;
+        const diffY = currentY - startY;
+        const rotate = diffX * 0.08;
+
+        card.style.transform = `translate(${diffX}px, ${diffY}px) rotate(${rotate}deg)`;
+
+        const likeStamp = card.querySelector(".stamp.like");
+        const nopeStamp = card.querySelector(".stamp.nope");
+        const superStamp = card.querySelector(".stamp.superlike");
+
+        // Vertical swipe up triggers superlike
+        if (diffY < -70 && Math.abs(diffX) < 50) {
+          superStamp.style.opacity = Math.min(-diffY / 120, 1);
+          likeStamp.style.opacity = 0;
+          nopeStamp.style.opacity = 0;
+        } else if (diffX > 25) {
+          likeStamp.style.opacity = Math.min(diffX / 100, 1);
+          nopeStamp.style.opacity = 0;
+          superStamp.style.opacity = 0;
+        } else if (diffX < -25) {
+          nopeStamp.style.opacity = Math.min(-diffX / 100, 1);
+          likeStamp.style.opacity = 0;
+          superStamp.style.opacity = 0;
+        } else {
+          likeStamp.style.opacity = 0;
+          nopeStamp.style.opacity = 0;
+          superStamp.style.opacity = 0;
+        }
+      }
+
+      function dragEnd(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        card.style.transition = "transform 0.4s ease, opacity 0.4s ease";
+
+        if (diffX > 110) {
+          handleVote("like");
+        } else if (diffX < -110) {
+          handleVote("nope");
+        } else {
+          card.style.transform = "translate(0px, 0px) rotate(0deg)";
+          card.querySelectorAll(".stamp").forEach(s => s.style.opacity = "0");
+        }
+        diffX = 0;
+      }
+
+      card.addEventListener("mousedown", dragStart);
+      window.addEventListener("mousemove", dragMove);
+      window.addEventListener("mouseup", dragEnd);
+
+      card.addEventListener("touchstart", dragStart, { passive: true });
+      window.addEventListener("touchmove", dragMove, { passive: true });
+      window.addEventListener("touchend", dragEnd);
+    }
+
+    function getTopCard() {
+      const cards = deck.querySelectorAll(".card");
+      return cards.length ? cards[cards.length - 1] : null;
+    }
+
+    function handleVote(decision) {
+      const card = getTopCard();
+      if (!card) return;
+
+      const stamp = card.querySelector(`.stamp.${decision}`);
+      if (stamp) stamp.style.opacity = "1";
+
+      let flyX = 0;
+      let flyY = 0;
+      let flyRot = 0;
+
+      if (decision === "like") {
+        flyX = 550;
+        flyRot = 24;
+      } else if (decision === "nope") {
+        flyX = -550;
+        flyRot = -24;
+      } else if (decision === "superlike") {
+        flyY = -600;
+      }
+
+      card.style.transition = "transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease";
+      card.style.transform = `translate(${flyX}px, ${flyY}px) rotate(${flyRot}deg)`;
+      card.style.opacity = "0";
+
+      if (decision === "like" || decision === "superlike") {
+        userSelections[flowSteps[currentStepIdx].key] = card.dataset.title;
+        setTimeout(() => {
+          currentStepIdx++;
+          renderDeck();
+        }, 320);
+      } else {
+        setTimeout(() => {
+          card.remove();
+          // Loop options if user skips everything
+          if (deck.querySelectorAll(".card").length === 0) {
+            renderDeck();
+          }
+        }, 320);
+      }
+    }
+
+    function triggerMatch() {
+      matchScreen.classList.add("visible");
+      summaryCard.innerHTML = `
+        🥂 <b>Status:</b> Mutual Match<br>
+        👗 <b>Vibe:</b> ${userSelections.vibe || "Monochrome All-Black"}<br>
+        📸 <b>Activity:</b> ${userSelections.activity || "Golden Hour Drive"}<br>
+        🍽️ <b>Dining:</b> ${userSelections.food || "Woodfired Pizza"}
+      `;
+
+      const phone = "917206490090";
+      const message = `Hey Niket! We matched on your Tinder date flow ✨%0A%0AHere is our locked-in itinerary:%0A👗 Vibe: ${userSelections.vibe}%0A📸 Plan: ${userSelections.activity}%0A🍽️ Dining: ${userSelections.food}%0A%0AWhen are you picking me up? 🥂`;
+      whatsappLink.href = `https://api.whatsapp.com/send?phone=${phone}&text=${message}`;
+    }
+
+    // Button controls
+    likeBtn.addEventListener("click", () => handleVote("like"));
+    nopeBtn.addEventListener("click", () => handleVote("nope"));
+    superlikeBtn.addEventListener("click", () => handleVote("superlike"));
+    rewindBtn.addEventListener("click", () => {
+      if (currentStepIdx > 0) {
+        currentStepIdx--;
+        renderDeck();
+      }
+    });
+
+    renderDeck();
+  </script>
+</body>
+</html>
